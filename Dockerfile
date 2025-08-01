@@ -91,6 +91,12 @@ RUN apt update \
   && sudo rm -rf /var/lib/apt/lists/* \
   && sudo apt clean -qq
 
+# install wamv_ctl dependencies
+RUN apt update \
+  && apt install -y --no-install-recommends \
+     python3-pymap3d \
+  && sudo rm -rf /var/lib/apt/lists/* \
+  && sudo apt clean -qq
 
   # NAV2
 RUN apt update \
