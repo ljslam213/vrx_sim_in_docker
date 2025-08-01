@@ -24,7 +24,8 @@ setup(
     entry_points={
         'console_scripts': [
             'inverse_kinematics = wamv_ctl.inverse_kinematics:main',
-            'station_keeping = wamv_ctl.station_keeping:main'
+            'station_keeping = wamv_ctl.station_keeping:main',
+            'wayfinding = wamv_ctl.wayfinding:main',
         ],
     },
 )
