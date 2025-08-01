@@ -8,8 +8,9 @@
     VRX任务 → goal_callback → 更新 cmd_pos 和 cmd_rot
 
     控制输出：
-    control_loop → 计算误差 → PID控制 → 发布 cmd_vel
-    同时发布 pose_error 供监控。'''
+    control_loop → 计算误差 → PID控制（两个模式,远距离和近距离） → 发布 cmd_vel
+    同时发布 pose_error 供监控。
+'''
 
 import math
 import numpy as np
@@ -56,7 +57,7 @@ class StationKeeping(Node):
         
         # 静态参数配置
         self.origin = (-33.724223, 150.679736, 0.0)  # WGS84原点
-        self.gps_offset = 0.85  # GPS天线偏移（米）
+        self.gps_offset = 0.85  # GPS天线偏移（米）## 补偿GPS天线到船质心的距离，这里认为是在质心的前面0.85米，坐标为(0.85,0)
         self.goal_tol = 1.0     # 接近模式触发距离（米）
         self.v_limit = 5.0      # GtG速度限制（米/秒）
         self.v_const = 0.5      # GtG接近阶段速度比例增益
@@ -128,6 +129,7 @@ class StationKeeping(Node):
 
         if distance > self.goal_tol:
             # Go-to-goal模式（远距离接近）：控制Vx和Wz
+			## 当船距离目标比较远，大于阈值时，进入这个模式，线速度的大小与距离成比例，角速度是利用pid来最小化heading_error
             desired_heading = math.atan2(err_vec[1], err_vec[0])
             heading_error = self.normalize_angle(desired_heading - self.cur_rot)
             
@@ -137,7 +139,7 @@ class StationKeeping(Node):
             # Station-keeping模式
             body_x = math.cos(self.cur_rot)
             body_y = math.sin(self.cur_rot)
-            along_track = err_vec[0] * body_x + err_vec[1] * body_y
+            along_track = err_vec[0] * body_x + err_vec[1] * body_y ## 将世界坐标系下的err_vec转换为机体坐标系
             cross_track = -err_vec[0] * body_y + err_vec[1] * body_x
 
             # 动态响应调整
@@ -145,6 +147,7 @@ class StationKeeping(Node):
             along_track *= adaptive_gain
             cross_track *= adaptive_gain
 
+			## 想实现精准控制，就微调x,y,yaw这三个量
             cmd_vel.linear.x = self.pid_sk_vx.control(along_track, t_now)
             cmd_vel.linear.y = self.pid_sk_vy.control(cross_track, t_now)
             cmd_vel.angular.z = self.pid_sk_wz.control(
