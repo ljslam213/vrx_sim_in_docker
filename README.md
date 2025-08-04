@@ -1,8 +1,6 @@
 # VRX in Docker
 
-ROS: humble
-
-Gazebo: garden
+docker镜像的配置：Ubuntu 22.04 | ROS: humble | Gazebo: garden
 
 ## 一、准备
 
@@ -25,12 +23,18 @@ echo \
 # 安装docker
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 使用docker不需要root权限
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
 ```
 
 ### 2. 安装rocker工具，[官方教程](https://github.com/HonuRobotics/dockwater/wiki/Install-Dependencies#step-3-install-rocker)
 
 ```bash
 # 运行成功的前提是添加过ROS的公钥和软件源，成功安装过ROS也行
+sudo apt update
 sudo apt install python3-rocker 
 ```
 
@@ -50,16 +54,16 @@ docker build -t vrx_sim:humble .
 #### 1.1. 集成核显卡
 
 ```bash
-rocker --devices /dev/dri/ --group-add video --group-add 110 --x11 --user --home  --network host --name vrx_sim vrx_sim:humble bash
+rocker --devices /dev/dri/ --group-add video --group-add 110 --x11 --user --home  --network host --name vrx_sim --hostname vrx_ctr vrx_sim:humble bash
 ```
 
 #### 1.2. Nvidia独立显卡
 
 ```bash
-rocker --nvidia --x11 --user --home  --network host --name vrx_sim vrx_sim:humble bash
+rocker --nvidia --x11 --user --home  --network host --name vrx_sim --hostname vrx_ctr vrx_sim:humble bash
 ```
 
-### 2. （容器中）编译代码
+### 2. 编译代码
 
 ```bash
 cd ~/vrx
@@ -68,7 +72,7 @@ colcon build --merge-install
 . install/setup.bash
 ```
 
-### 3. 启动vrx的仿真环境，更详细的教程可参考[vrx](https://github.com/osrf/vrx/wiki/tutorials)
+### 3. 运行vrx的控制实例
 
 #### 3.1. 定点控制
 
@@ -101,7 +105,7 @@ cd ~/vrx
 ros2 run wamv_ctl station_keeping
 ```
 
-#### 3.2. 跟踪路径-PID
+#### 3.2. 路径跟踪-PID
 
 ##### 3.2.1. 启动仿真环境（容器中）
 
@@ -132,11 +136,15 @@ cd ~/vrx
 ros2 run wamv_ctl wayfinding
 ```
 
+#### 3.3 路径跟踪-LOS
+
+(待完成)
+
 ## 三、调整环境参数
 
 ### 1. 调整风力
 
-修改仿真世界中~/Everything/vrx_ws/src/vrx/vrx_gz/worlds/sydney_regatta.sdf中libUSVWind.so插件
+修改仿真世界中~/vrx_ws/src/vrx/vrx_gz/worlds/sydney_regatta.sdf中libUSVWind.so插件
 
 ```xml
   <plugin
@@ -163,7 +171,7 @@ ros2 run wamv_ctl wayfinding
 
 ### 2. 调整波浪
 
-修改仿真世界中~/Everything/vrx_ws/src/vrx/vrx_gz/worlds/sydney_regatta.sdf中libPublisherPlugin.so插件
+修改仿真世界中~/vrx_ws/src/vrx/vrx_gz/worlds/sydney_regatta.sdf中libPublisherPlugin.so插件
 
 ```xml
  <plugin filename="libPublisherPlugin.so" name="vrx::PublisherPlugin">
@@ -200,4 +208,3 @@ ros2 run wamv_ctl wayfinding
    </message>
  </plugin>
 ```
-

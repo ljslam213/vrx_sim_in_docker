@@ -6,6 +6,10 @@ ENV TZ=Etc/UTC
 RUN echo $TZ > /etc/timezone && \
   ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
   
+# remove old ros-gz-sim
+RUN apt remove -y ros-humble-ros-gz-sim \
+    && apt -y autoremove
+
 # Tools necessary and useful during development
 RUN apt update && \
  DEBIAN_FRONTEND=noninteractive \
