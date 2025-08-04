@@ -138,7 +138,12 @@ ros2 run wamv_ctl wayfinding
 
 #### 3.3 路径跟踪-LOS
 
-(待完成)
+```bash
+source /opt/ros/humble/setup.bash
+cd ~/vrx
+. install/setup.bash
+ros2 launch wamv_ctl run_wamv_adpLOS.launch.py
+```
 
 ## 三、调整环境参数
 
