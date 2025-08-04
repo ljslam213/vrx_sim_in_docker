@@ -42,7 +42,7 @@ sudo apt install python3-rocker
 
 ```bash
 cd ~
-git clone XXX 
+git clone https://github.com/ljslam213/vrx_sim_in_docker.git vrx_ws
 cd ~/vrx_ws
 docker build -t vrx_sim:humble .
 ```
