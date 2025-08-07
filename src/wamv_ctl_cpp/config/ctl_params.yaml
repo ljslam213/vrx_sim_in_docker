@@ -1,0 +1,20 @@
+uv_control:
+    ros__parameters:
+        thrust_factor: 1.0
+        v_x_gain: 300.0
+        v_y_gain: 300.0
+        w_z_gain: 1000.0
+        left_pos_x: -2.373 # TODO
+        left_pos_y: 1.373 
+        right_pos_x: -2.373 
+        right_pos_y: -1.373 
+        max_thrust: 1000.0
+        max_angle: 3.14
+        max_angle_rate: 0.52
+        max_linear: 3.0
+        max_angular: 0.5
+        thruster_mode: false
+        # propeller params
+        pp_fluid_density: 1000.0
+        pp_thrust_coefficient: 0.2
+        pp_diameter: 0.3
